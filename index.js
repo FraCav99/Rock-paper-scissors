@@ -1,4 +1,24 @@
-// Create the moves and array of moves
+/*===================== Target DOM elements ============*/
+
+const choices = document.querySelectorAll('.choice');
+const resetBtn = document.getElementById('reset');
+
+const playerContainer = document.getElementById('player-score');
+const playerChoice = playerContainer.querySelector('.display-choice');
+const playerScore = playerContainer.querySelector('.display-score');
+
+const computerContainer = document.getElementById('computer-score');
+const computerChoice = computerContainer.querySelector('.display-choice');
+const computerScore = computerContainer.querySelector('.display-score');
+
+const currentWin = document.getElementById('current-win');
+const showCurrentRound = document.getElementById('current-round');
+const winnerDisplay = document.getElementById('winner-display');
+
+/*========================================================*/
+
+
+/*===================== Global variables ================*/
 
 const PAPER = 'PAPER';
 const SCISSORS = 'SCISSORS';
@@ -8,6 +28,12 @@ const moves = [ROCK, PAPER, SCISSORS];
 
 let playerWins = 0;
 let computerWins = 0;
+let currentRound = 1;
+
+/*========================================================*/
+
+
+/*===================== Functions =======================*/
 
 function computerPlay() {
     let random = Math.floor(Math.random() * moves.length);
@@ -16,53 +42,53 @@ function computerPlay() {
     return randomChoice;
 }
 
-
 function playRound(pSelection, cSelection) {
-    // Check the user input
-    if (!moves.includes(pSelection.toUpperCase())) {
-        pSelection = computerPlay();    // Set the user choice to a random choice
-        alert(`Wrong choice. ${pSelection} was selected for you!`);
-    }
+    showCurrentRound.textContent = currentRound;
 
     // Check for victory
     if (
-        pSelection.toUpperCase() === ROCK && cSelection === SCISSORS ||
-        pSelection.toUpperCase() === SCISSORS && cSelection === PAPER ||
-        pSelection.toUpperCase() === PAPER && cSelection === ROCK
+        pSelection === ROCK && cSelection === SCISSORS ||
+        pSelection === SCISSORS && cSelection === PAPER ||
+        pSelection === PAPER && cSelection === ROCK
     ) {
         playerWins++;
-        alert(`
-        ${pSelection.toUpperCase()} beats ${cSelection}\n
-        player: ${playerWins} - computer: ${computerWins}
-    `)
+        playerScore.textContent = playerWins;
+        currentWin.textContent = 'Player win!';
     }
-    else if (pSelection.toUpperCase() === cSelection) {
-        alert("It's a draw!");
+    else if (pSelection === cSelection) {
+        currentWin.textContent = "It's a draw!";
     }
     else {
         computerWins++;
-        alert(`
-        ${cSelection} beats ${pSelection.toUpperCase()}\n
-        player: ${playerWins} - computer: ${computerWins}
-    `)
-    }
-}
-
-
-function game() {
-
-    for (let i = 1; i <= 5; i++) {
-        let computerSelection = computerPlay();
-        let playerSelection = prompt("Choose Rock, Paper, Scissors");
-        alert(`Round ${i}`);
-        playRound(playerSelection, computerSelection);
+        computerScore.textContent = computerWins;
+        currentWin.textContent = 'Computer win!';
     }
 
-    let message = `Player: ${playerWins} - Computer: ${computerWins}`;
+    // Change the UI text
+    computerChoice.textContent =  cSelection;
+    playerChoice.textContent = pSelection;
 
-    if (playerWins > computerWins) alert(message + "\nPlayer Wins!");
-    else if (playerWins === computerWins) {alert("It's a draw!")}
-    else {alert(message + "\nComputer Wins!");}
+    currentRound++;
 }
 
-game();
+function resetStat() {
+    playerWins = 0;
+    computerWins = 0;
+    currentRound = 1;
+
+    computerScore.textContent = computerWins;
+    playerScore.textContent = playerWins;
+    showCurrentRound.textContent = currentRound;
+
+    currentWin.textContent = '';
+    computerChoice.textContent = '/';
+    playerChoice.textContent = '/';
+}
+
+for (let choice of choices) {
+    choice.addEventListener('click', () => {
+        playRound(choice.value, computerPlay());
+    });
+}
+
+resetBtn.addEventListener('click', resetStat);
